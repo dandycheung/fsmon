@@ -212,6 +212,16 @@ aagt21compile:
 aalt21compile:
 	ndk-gcc $(ANDROID_API) $(KITKAT_CFLAGS) $(CFLAGS) $(LDFLAGS) -o fsmon-and$(ANDROID_API)-$(NDK_ARCH) $(SOURCES)
 
+brewinstall:
+	brew reinstall --HEAD ./fsmon.rb
+
+dos:
+	brew install --build-from-source fsmon.rb
+
+brewcheck:
+	brew audit --strict fsmon.rb
+	brew test fsmon
+
 .PHONY: all fsmon clean
 .PHONY: install uninstall
-.PHONY: and android
+.PHONY: and android brewinstall
