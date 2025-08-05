@@ -2,11 +2,18 @@
 
 ![ci](https://github.com/nowsecure/fsmon/actions/workflows/ci.yml/badge.svg?branch=master)
 
-Filesystem Monitor utility for Linux, Android, iOS and macOS.
+Low level filesystem monitor utility for Linux, Android, iOS and macOS.
 
-Brought to you by *Sergi Àlvarez* at **Nowsecure** and distributed under the **MIT** license.
+- **Author**: pancake @ nowsecure
+- **License**: MIT
 
-**Contact**: pancake@nowsecure.com
+Designed for
+
+- System administrators and incident responders
+- Security researchers and forensic analysts
+- Developers debugging I/O-heavy applications
+- Reverse engineers interested in observing filesystem access behavior
+
 
 ## Installation
 
@@ -54,55 +61,86 @@ Examples:
 $
 ```
 
-## Backends
+## 🔍 Key Features of fsmon
 
-fsmon filesystem information is taken from different backends depending on the operating system and apis available.
+`fsmon` is a low-level, cross-platform filesystem monitor designed for developers, forensic analysts, and reverse engineers. It works by hooking into the OS kernel's tracing facilities or file notification APIs.
 
-This is the list of backends that can be listed with `fsmon -L`:
+### ✅ Supported Platforms
 
-* inotify (linux / android)
-* fanotify (linux > 2.6.36 / android with custom kernel)
-* devfsev (osx /dev/fsevents - requires root)
-* kqueue (xnu - requires root)
-* kdebug (bsd?, xnu - requires root)
-* fsevapi (osx filesystem monitor api)
+- **Android**: via `inotify`, `fanotify` is not always supported
+- **Linux**: via `inotify` and `fanotify`
+- **macOS**: using `kdebug`, `FSEvents`, `kqueue`, and `/dev/fsevents`
+- **iOS** (limited support through FSEvent APIs)
+
+### Core Capabilities
+
+- **Real-Time File Monitoring**
+  Detects and reports file operations such as creation, deletion, modification, attribute changes, and renames in real-time.
+
+- **Multi-Backend Support**
+
+  Automatically selects the best available monitoring backend or allows users to choose:
+  - `inotify`, `fanotify` (Linux)
+  - `fsevapi`, `kdebug`, `devfsev`, `kqueue` (iOS / macOS)
+
+  The list of backends can be listed with `fsmon -L`.
+
+- **Process-Level Insights**
+  Associates file events with process names, PIDs, and UIDs, where possible.
+
+- **Recursive Monitoring**
+  Monitors entire directory trees recursively, dynamically adding new directories.
+
+- **JSON Output Format**
+  Supports structured logging in JSON or JSON stream mode for easy integration with other tools (e.g. `jq`, `ELK`, etc).
+
+- **Filename Filtering & Formatting**
+  Optionally strips full paths, shows only filenames, and colorizes output based on event type.
+
+- **Selective Monitoring**
+  Filter events by:
+  - Specific process name (`-P`)
+  - Specific PID (`-p`)
+  - Child processes (`-c`)
+  - Files under a given path
+
+- **Backup on Event**
+  Automatically copies affected files to a backup directory when changes are detected (`-b`).
+
+- **Timestamping**
+  Adds timestamps to each event to facilitate forensic analysis.
+
+- **Minimal Dependencies**
+  Written in portable C with no runtime dependencies beyond standard libraries.
+
+- **Graceful Shutdown & Signal Handling**
+  Handles `SIGINT`, `SIGTERM`, and `SIGALRM` to allow clean exits and timed monitoring sessions.
+
+### 🧪 Event Types Tracked
+
+Examples of events that `fsmon` can detect:
+
+- `CREATE_FILE`, `DELETE`, `RENAME`
+- `OPEN`, `CLOSE`, `STAT_CHANGED`
+- `CHOWN`, `CHMOD`, `XATTR_MODIFIED`
+- `CONTENT_MODIFIED`, `EXCHANGE`, `FINDER_INFO_CHANGED`
 
 ## Compilation
 
 fsmon is a portable tool. It works on iOS, OSX, Linux and Android (x86, arm, arm64, mips)
 
-*Linux*
-
 ```bash
 $ make
 ```
 
-*OSX + iOS fatbin*
-
-```bash
-$ make
-```
-
-*iOS*
-
-```bash
-$ make ios
-```
-
-*Android*
+Crosscompilation to iOS/Android is made easy by just running `make ios` or `make android`:
 
 ```bash
 $ make android NDK_ARCH=<ARCH> ANDROID_API=<API>
 ```
 
-To get fsmon installed system wide just type:
+## License
 
-```bash
-$ make install
-```
+This tool is free software developed by [NowSecure](https://nowsecure.com) and distributed under the MIT license.
 
-Changing installation path...
-
-```bash
-$ make install PREFIX=/usr DESTDIR=/
-```
+You can reach out **Sergi Alvarez** via email [pancake@nowsecure.com](mailto:pancake@nowsecure.com)
